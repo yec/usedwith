@@ -2,6 +2,9 @@
 """
  Used with
  Find the part and used with part
+ Takes one filename as argument
+
+    python usedwith.py data.xml
 
  @author    Ye Chuah
  @copyright invenn.com.au
