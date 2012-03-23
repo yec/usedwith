@@ -38,7 +38,7 @@ def main():
     for match in matches:
 
         """ Need to find where to start submatch from because gross match will
-        erroneously return first PNR used with UWP """
+        erroneously return first PNR used with UWP. Use last item found """
         for m in re.finditer('<ITEM', match, re.S):
             start =  m.start()
 
