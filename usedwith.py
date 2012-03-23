@@ -34,7 +34,8 @@ def main():
     matches = re.findall('<ITEM.+?UWPMFR.+?</ITEM', data, re.S)
 
     """ Folowing pattern extracts part number and used with part number with submatches"""
-    pattern = re.compile('PNR [^>]+>(.+?)</PNR.+?UWP [^>]+>(.+?)</UWP', re.S)
+    partpattern = re.compile('PNR [^>]+>(.+?)</PNR', re.S)
+    usedpattern = re.compile('UWP [^>]+>(.+?)</UWP', re.S)
 
     print "Part Number\tUsed With Part Number"
 
@@ -45,9 +46,12 @@ def main():
         for m in re.finditer('<ITEM', match, re.S):
             start =  m.start()
 
-        part =  pattern.search(match[start:]).group(1).strip()
-        used_with = pattern.search(match[start:]).group(2).strip()
-        print "%s\t%s" % (part, used_with)
+        part =  partpattern.search(match[start:]).group(1).strip()
+
+        for m in re.finditer('<UWPMFR', match, re.S):
+            start = m.start()
+            used_with = usedpattern.search(match[start:]).group(1).strip()
+            print "%s\t%s" % (part, used_with)
 
 
 if __name__ == "__main__":
