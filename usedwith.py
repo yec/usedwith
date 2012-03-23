@@ -36,8 +36,14 @@ def main():
     print "Part Number\tUsed With Part Number"
 
     for match in matches:
-        part =  pattern.search(match).group(1).strip()
-        used_with = pattern.search(match).group(2).strip()
+
+        """ Need to find where to start submatch from because gross match will
+        erroneously return first PNR used with UWP """
+        for m in re.finditer('<ITEM', match, re.S):
+            start =  m.start()
+
+        part =  pattern.search(match[start:]).group(1).strip()
+        used_with = pattern.search(match[start:]).group(2).strip()
         print "%s\t%s" % (part, used_with)
 
 
