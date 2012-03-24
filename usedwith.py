@@ -37,12 +37,16 @@ def main():
     partpattern = re.compile('PNR.+?PID="(.+?)".*?>(.+?)</PNR', re.S)
     usedpattern = re.compile('UWP.+?PID="(.+?)".*?>(.+?)</UWP', re.S)
     einpattern = re.compile('EIN.+?TYPE="(.+?)".*?>(.+?)</EIN', re.S)
+    revdatepattern = re.compile('REVDATE="(.+?)"', re.S)
+    keypattern = re.compile('KEY="(.+?)"', re.S)
 
-    print "PNR PID\tPart Number\tUWP PID\tUsed With Part Number\tEIN\tEIN Type"
+    print "Key\tRevision Date\tPNR PID\tPart Number\tUWP PID\tUsed With Part Number\tEIN\tEIN Type"
 
     for match in matches:
 
         """ submatch part number """
+        key = keypattern.search(match).group(1).strip()
+        revdate = revdatepattern.search(match).group(1).strip()
         part_pid =  partpattern.search(match).group(1).strip()
         part =  partpattern.search(match).group(2).strip()
 
@@ -52,18 +56,18 @@ def main():
             start = m.start()
             used_with_pid = usedpattern.search(match[start:]).group(1).strip()
             used_with = usedpattern.search(match[start:]).group(2).strip()
-            print "%s\t%s\t%s\t%s" % (part_pid, part, used_with_pid, used_with)
+            print "%s\t%s\t%s\t%s\t%s\t%s" % (key, revdate, part_pid, part, used_with_pid, used_with)
 
         for m in re.finditer('<EIN', match, re.S):
             iters = iters + 1
             start = m.start()
             ein = einpattern.search(match[start:]).group(2).strip()
             ein_type = einpattern.search(match[start:]).group(1).strip()
-            print "%s\t%s\t\t\t%s\t%s" % (part_pid, part, ein, ein_type)
+            print "%s\t%s\t%s\t%s\t\t\t%s\t%s" % (key, revdate, part_pid, part, ein, ein_type)
 
         """ print out part number without used with if not found """
         if iters == 0:
-            print "%s\t%s" % (part_pid, part)
+            print "%s\t%s\t%s\t%s" % (key, revdate, part_pid, part)
 
 
 if __name__ == "__main__":
