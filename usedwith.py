@@ -31,7 +31,7 @@ def main():
         print "Couldn't open %s" % filename
         sys.exit(0)
 
-    matches = re.findall('<ITEM.+?UWPMFR.+?</ITEM', data, re.S)
+    matches = re.findall('<ITEM.+?</ITEM', data, re.S)
 
     """ Folowing pattern extracts part number and used with part number with submatches"""
     partpattern = re.compile('PNR [^>]+>(.+?)</PNR', re.S)
@@ -41,17 +41,19 @@ def main():
 
     for match in matches:
 
-        """ Need to find where to start submatch from because gross match will
-        erroneously return first PNR used with UWP. Use last item found """
-        for m in re.finditer('<ITEM', match, re.S):
-            start =  m.start()
+        """ submatch part number """
+        part =  partpattern.search(match).group(1).strip()
 
-        part =  partpattern.search(match[start:]).group(1).strip()
-
+        iters = 0;
         for m in re.finditer('<UWPMFR', match, re.S):
+            iters = iters + 1
             start = m.start()
             used_with = usedpattern.search(match[start:]).group(1).strip()
             print "%s\t%s" % (part, used_with)
+
+        """ print out part number without used with if not found """
+        if iters == 0:
+            print "%s" % part
 
 
 if __name__ == "__main__":
