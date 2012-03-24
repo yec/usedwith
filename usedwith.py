@@ -34,26 +34,36 @@ def main():
     matches = re.findall('<ITEM.+?</ITEM', data, re.S)
 
     """ Folowing pattern extracts part number and used with part number with submatches"""
-    partpattern = re.compile('PNR [^>]+>(.+?)</PNR', re.S)
-    usedpattern = re.compile('UWP [^>]+>(.+?)</UWP', re.S)
+    partpattern = re.compile('PNR.+?PID="(.+?)".*?>(.+?)</PNR', re.S)
+    usedpattern = re.compile('UWP.+?PID="(.+?)".*?>(.+?)</UWP', re.S)
+    einpattern = re.compile('EIN.+?TYPE="(.+?)".*?>(.+?)</EIN', re.S)
 
-    print "Part Number\tUsed With Part Number"
+    print "PNR PID\tPart Number\tUWP PID\tUsed With Part Number\tEIN\tEIN Type"
 
     for match in matches:
 
         """ submatch part number """
-        part =  partpattern.search(match).group(1).strip()
+        part_pid =  partpattern.search(match).group(1).strip()
+        part =  partpattern.search(match).group(2).strip()
 
         iters = 0;
         for m in re.finditer('<UWPMFR', match, re.S):
             iters = iters + 1
             start = m.start()
-            used_with = usedpattern.search(match[start:]).group(1).strip()
-            print "%s\t%s" % (part, used_with)
+            used_with_pid = usedpattern.search(match[start:]).group(1).strip()
+            used_with = usedpattern.search(match[start:]).group(2).strip()
+            print "%s\t%s\t%s\t%s" % (part_pid, part, used_with_pid, used_with)
+
+        for m in re.finditer('<EIN', match, re.S):
+            iters = iters + 1
+            start = m.start()
+            ein = einpattern.search(match[start:]).group(2).strip()
+            ein_type = einpattern.search(match[start:]).group(1).strip()
+            print "%s\t%s\t\t\t%s\t%s" % (part_pid, part, ein, ein_type)
 
         """ print out part number without used with if not found """
         if iters == 0:
-            print "%s" % part
+            print "%s\t%s" % (part_pid, part)
 
 
 if __name__ == "__main__":
