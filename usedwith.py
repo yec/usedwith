@@ -2,9 +2,13 @@
 """
  Used with
  Find the part and used with part
- Takes one filename as argument
+ Takes one filename as argument:
 
     python usedwith.py data.xml
+
+ To write to file and only keep uniq rows:
+
+    python usedwith.py data.xml | uniq > output.txt
 
  @author    Ye Chuah
  @copyright invenn.com.au
